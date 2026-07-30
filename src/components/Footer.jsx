@@ -9,7 +9,7 @@ import {
 import { FaXTwitter } from "react-icons/fa6";
 import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
 
-export default function Footer() {
+const Footer = () => {
   return (
     <footer className="bg-slate-950 text-slate-300 border-t border-slate-800">
       <div className="max-w-7xl mx-auto px-6 py-12">
@@ -188,3 +188,4 @@ export default function Footer() {
     </footer>
   );
 }
+export default Footer;

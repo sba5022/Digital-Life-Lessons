@@ -1,14 +1,15 @@
 "use client";
-
+import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
 import Link from "next/link";
 import { Card, CardBody, Input, Button } from "@heroui/react";
 import { FcGoogle } from "react-icons/fc";
-
-export default function RegisterPage() {
+import { useRouter } from "next/navigation";
+import { createAuthClient } from "better-auth/client";
+const RegisterPage = () => {
   const [error, setError] = useState("");
-
-  const handleRegister = (e) => {
+const router = useRouter();
+  const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -40,13 +41,33 @@ export default function RegisterPage() {
     };
 
     console.log(user);
+    const { data, error } = await authClient.signUp.email({
+    name: user.name, // required
+    email: user.email, // required
+    password: user.password, // required
+    image:user. photo,
+    
+});
+
+if (data) {
+  router.push("/login");
+}
+
+if(error){
+  alert(error.message);
+}
+console.log({data, error});
 
     // Registration Logic Here
   };
+const authClient = createAuthClient();
+   const handleGoogleRegister = async () => {
+    await authClient.signUp.social({
+      provider: "google",
 
-  const handleGoogleLogin = () => {
-    console.log("Google Login");
-  };
+    })
+
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 flex items-center justify-center px-4 py-10">
@@ -147,14 +168,14 @@ export default function RegisterPage() {
 
           </div>
 
-          <button
+          <Button
             
             className="w-full btn btn-success"
             startContent={<FcGoogle size={22} />}
-            onPress={handleGoogleLogin}
+            onPress={handleGoogleRegister}
           >
             Continue with Google
-          </button>
+          </Button>
 
           <p className="text-center text-slate-400 mt-6">
             Already have an account?{" "}
@@ -171,3 +192,4 @@ export default function RegisterPage() {
     </div>
   );
 }
+export default RegisterPage;

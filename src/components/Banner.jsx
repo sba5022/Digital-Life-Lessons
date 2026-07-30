@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-export default function Banner() {
+const Banner = () => {
   return (
     <div className="carousel w-full h-[80vh] rounded-xl">
 
@@ -110,3 +110,4 @@ export default function Banner() {
     </div>
   );
 }
+export default Banner;

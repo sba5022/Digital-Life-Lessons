@@ -1,16 +1,26 @@
 "use client";
-
+import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
-import Image from "next/image";
 
-export default function Navbar() {
+
+const Navbar = () => {
+  const handleLogout = async () => {  
+
+  await authClient.signOut();
+}
+        const { 
+        data: session, 
+      
+    } = authClient.useSession() ;
+    const user = session?.user;
+    console.log(user);
     // Replace with your auth/session
-    const user = {
-        name: "John Doe",
-        image: "",
-        // https://i.pravatar.cc/100
-        plan: "Free", // Free | Premium
-    };
+    // const user = {
+    //     name: "John Doe",
+    //     image: "",
+    //     // https://i.pravatar.cc/100
+    //     plan: "Free", // Free | Premium
+    // };
 
     const navLinks = (
         <>
@@ -108,7 +118,56 @@ export default function Navbar() {
 
             <div className="navbar-end">
 
-  <div className="flex gap-2">
+  <div className="navbar-end">
+  {user ? (
+    <div className="dropdown dropdown-end">
+
+      <div
+        tabIndex={0}
+        role="button"
+        className="btn btn-ghost flex items-center gap-2"
+      >
+        <img
+          src={user.image }
+          alt={user.name}
+          className="w-10 h-10 rounded-full object-cover"
+        />
+
+        <span className="hidden md:block font-semibold">
+          {user.name}
+        </span>
+      </div>
+
+      <ul
+        tabIndex={0}
+        className="menu menu-sm dropdown-content mt-3 z-[100] p-2 shadow bg-base-100 rounded-box w-56"
+      >
+        <li className="menu-title">
+          <span>{user.name}</span>
+        </li>
+
+        <li>
+          <span>{user.email}</span>
+        </li>
+
+        <li>
+          <Link href="/profile">Profile</Link>
+        </li>
+
+        <li>
+          <button className="btn btn-info" onClick={handleLogout}
+            // onClick={async () => {
+            //   await authClient.signOut();
+            // }}
+          >
+            Logout
+          </button>
+        </li>
+      </ul>
+
+    </div>
+  ) : (
+    <div className="flex gap-2">
       <Link href="/login" className="btn btn-primary">
         Login
       </Link>
@@ -117,9 +176,12 @@ export default function Navbar() {
         Signup
       </Link>
     </div>
+  )}
+</div>
 
 </div>
 
         </div>
     );
 }
+export default Navbar;
