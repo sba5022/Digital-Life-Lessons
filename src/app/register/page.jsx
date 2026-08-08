@@ -5,10 +5,11 @@ import Link from "next/link";
 import { Card, CardBody, Input, Button } from "@heroui/react";
 import { FcGoogle } from "react-icons/fc";
 import { useRouter } from "next/navigation";
-import { createAuthClient } from "better-auth/client";
+//  import { createAuthClient } from "better-auth/client";
 const RegisterPage = () => {
+  const router = useRouter();
   const [error, setError] = useState("");
-const router = useRouter();
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
@@ -60,9 +61,9 @@ console.log({data, error});
 
     // Registration Logic Here
   };
-const authClient = createAuthClient();
+// const authClient = createAuthClient();
    const handleGoogleRegister = async () => {
-    await authClient.signUp.social({
+    await authClient.signIn.social({
       provider: "google",
 
     })

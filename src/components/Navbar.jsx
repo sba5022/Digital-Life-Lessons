@@ -146,8 +146,8 @@ const Navbar = () => {
           <span>{user.name}</span>
         </li>
 
-        <li>
-          <span>{user.email}</span>
+         <li>
+          <Link href="/dashboard">Dashboard</Link>
         </li>
 
         <li>
