@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -24,7 +25,7 @@ export default function AddLessonPage() {
 
   const user = session?.user;
 
-  // Change this according to how you store the user's plan.
+  // Change this according to your database structure
   const isPremium = user?.plan === "Premium";
 
   const [formData, setFormData] = useState({
@@ -32,12 +33,14 @@ export default function AddLessonPage() {
     description: "",
     category: "",
     emotionalTone: "",
-    image: "",
+    // image: "",
     accessLevel: "Free",
   });
 
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState("");
+
+ 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,12 +49,79 @@ export default function AddLessonPage() {
       ...previous,
       [name]: value,
     }));
+
+    // Remove error when user starts fixing it
+    setErrors((previous) => ({
+      ...previous,
+      [name]: "",
+    }));
+
+    setSuccess("");
+  };
+
+ 
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Title
+    if (!formData.title.trim()) {
+      newErrors.title = "Lesson title is required.";
+    } else if (formData.title.trim().length < 5) {
+      newErrors.title =
+        "Lesson title must be at least 5 characters.";
+    } else if (formData.title.trim().length > 100) {
+      newErrors.title =
+        "Lesson title cannot exceed 100 characters.";
+    }
+
+    // Description
+    if (!formData.description.trim()) {
+      newErrors.description =
+        "Please provide your lesson description.";
+    } else if (formData.description.trim().length < 20) {
+      newErrors.description =
+        "Description must be at least 20 characters.";
+    } else if (formData.description.trim().length > 5000) {
+      newErrors.description =
+        "Description cannot exceed 5000 characters.";
+    }
+
+    // Category
+    if (!formData.category) {
+      newErrors.category =
+        "Please select a category.";
+    }
+
+    // Emotional Tone
+    if (!formData.emotionalTone) {
+      newErrors.emotionalTone =
+        "Please select an emotional tone.";
+    }
+
+    // Image
+    // if (formData.image.trim()) {
+    //   try {
+    //     new URL(formData.image);
+    //   } catch {
+    //     newErrors.image =
+    //       "Please enter a valid image URL.";
+    //   }
+    // }
+
+    // Access Level
+    if (!isPremium && formData.accessLevel === "Premium") {
+      newErrors.accessLevel =
+        "Only Premium users can create Premium lessons.";
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleAccessChange = (e) => {
     const value = e.target.value;
 
-    // Free users can never select Premium
     if (!isPremium && value === "Premium") {
       return;
     }
@@ -60,25 +130,30 @@ export default function AddLessonPage() {
       ...previous,
       accessLevel: value,
     }));
+
+    setErrors((previous) => ({
+      ...previous,
+      accessLevel: "",
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setError("");
     setSuccess("");
 
-    // Security check on the client side
-    if (!isPremium) {
-      formData.accessLevel = "Free";
+    const isValid = validateForm();
+
+    if (!isValid) {
+      return;
     }
 
     const lessonData = {
-      title: formData.title,
-      description: formData.description,
+      title: formData.title.trim(),
+      description: formData.description.trim(),
       category: formData.category,
       emotionalTone: formData.emotionalTone,
-      image: formData.image,
+      // image: formData.image.trim(),
       accessLevel: isPremium
         ? formData.accessLevel
         : "Free",
@@ -91,6 +166,7 @@ export default function AddLessonPage() {
 
     setSuccess("Lesson created successfully!");
 
+    // Reset form
     setFormData({
       title: "",
       description: "",
@@ -99,7 +175,11 @@ export default function AddLessonPage() {
       image: "",
       accessLevel: "Free",
     });
+
+    setErrors({});
   };
+
+
 
   if (isPending) {
     return (
@@ -108,6 +188,7 @@ export default function AddLessonPage() {
       </div>
     );
   }
+
 
   if (!session) {
     return (
@@ -139,7 +220,9 @@ export default function AddLessonPage() {
       </div>
 
       <Card className="border border-default-200">
+
         <form
+        // validationBehavior="aria"
           onSubmit={handleSubmit}
           className="p-6 md:p-8 space-y-6"
         >
@@ -156,9 +239,18 @@ export default function AddLessonPage() {
               value={formData.title}
               onChange={handleChange}
               placeholder="What did you learn?"
-              required
-              className="w-full rounded-xl border border-default-300 bg-transparent px-4 py-3 outline-none focus:border-primary"
+              className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none ${
+                errors.title
+                  ? "border-danger"
+                  : "border-default-300 focus:border-primary"
+              }`}
             />
+
+            {errors.title && (
+              <p className="text-danger text-sm mt-2">
+                {errors.title}
+              </p>
+            )}
           </div>
 
           {/* Description */}
@@ -173,9 +265,28 @@ export default function AddLessonPage() {
               onChange={handleChange}
               placeholder="Share your story or explain the lesson..."
               rows={7}
-              required
-              className="w-full rounded-xl border border-default-300 bg-transparent px-4 py-3 outline-none resize-none focus:border-primary"
+              className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none resize-none ${
+                errors.description
+                  ? "border-danger"
+                  : "border-default-300 focus:border-primary"
+              }`}
             />
+
+            <div className="flex justify-between mt-2">
+              {errors.description ? (
+                <p className="text-danger text-sm">
+                  {errors.description}
+                </p>
+              ) : (
+                <p className="text-default-400 text-xs">
+                  Minimum 20 characters
+                </p>
+              )}
+
+              <p className="text-default-400 text-xs">
+                {formData.description.length}/5000
+              </p>
+            </div>
           </div>
 
           {/* Category + Emotional Tone */}
@@ -191,8 +302,11 @@ export default function AddLessonPage() {
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                required
-                className="w-full rounded-xl border border-default-300 bg-transparent px-4 py-3 outline-none focus:border-primary"
+                className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none ${
+                  errors.category
+                    ? "border-danger"
+                    : "border-default-300 focus:border-primary"
+                }`}
               >
                 <option value="">
                   Select category
@@ -207,6 +321,12 @@ export default function AddLessonPage() {
                   </option>
                 ))}
               </select>
+
+              {errors.category && (
+                <p className="text-danger text-sm mt-2">
+                  {errors.category}
+                </p>
+              )}
             </div>
 
             {/* Emotional Tone */}
@@ -219,8 +339,11 @@ export default function AddLessonPage() {
                 name="emotionalTone"
                 value={formData.emotionalTone}
                 onChange={handleChange}
-                required
-                className="w-full rounded-xl border border-default-300 bg-transparent px-4 py-3 outline-none focus:border-primary"
+                className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none ${
+                  errors.emotionalTone
+                    ? "border-danger"
+                    : "border-default-300 focus:border-primary"
+                }`}
               >
                 <option value="">
                   Select emotional tone
@@ -235,71 +358,55 @@ export default function AddLessonPage() {
                   </option>
                 ))}
               </select>
+
+              {errors.emotionalTone && (
+                <p className="text-danger text-sm mt-2">
+                  {errors.emotionalTone}
+                </p>
+              )}
             </div>
-
           </div>
 
-          {/* Image */}
-          <div>
-            <label className="block text-sm font-semibold mb-2">
-              Image
-              <span className="text-default-400 font-normal">
-                {" "} (Optional)
-              </span>
-            </label>
-
-            <input
-              type="url"
-              name="image"
-              value={formData.image}
-              onChange={handleChange}
-              placeholder="https://example.com/image.jpg"
-              className="w-full rounded-xl border border-default-300 bg-transparent px-4 py-3 outline-none focus:border-primary"
-            />
-
-            <p className="text-xs text-default-400 mt-2">
-              Add an image URL related to your lesson.
-            </p>
-          </div>
-
-          {/* Access Level */}
+       
+    
           <div>
             <label className="block text-sm font-semibold mb-2">
               Access Level
             </label>
 
-            <div className="relative">
+            <select
+              name="accessLevel"
+              value={
+                isPremium
+                  ? formData.accessLevel
+                  : "Free"
+              }
+              onChange={handleAccessChange}
+              disabled={!isPremium}
+              className={`w-full rounded-xl border px-4 py-3 outline-none ${
+                isPremium
+                  ? "border-default-300 bg-transparent focus:border-primary"
+                  : "border-default-200 bg-default-100 text-default-500 cursor-not-allowed"
+              }`}
+            >
+              <option value="Free">
+                Free
+              </option>
 
-              <select
-                name="accessLevel"
-                value={
-                  isPremium
-                    ? formData.accessLevel
-                    : "Free"
-                }
-                onChange={handleAccessChange}
+              <option
+                value="Premium"
                 disabled={!isPremium}
-                className={`w-full rounded-xl border px-4 py-3 outline-none ${
-                  isPremium
-                    ? "border-default-300 bg-transparent focus:border-primary"
-                    : "border-default-200 bg-default-100 text-default-500 cursor-not-allowed"
-                }`}
               >
-                <option value="Free">
-                  Free
-                </option>
+                Premium
+              </option>
+            </select>
 
-                <option
-                  value="Premium"
-                  disabled={!isPremium}
-                >
-                  Premium
-                </option>
-              </select>
+            {errors.accessLevel && (
+              <p className="text-danger text-sm mt-2">
+                {errors.accessLevel}
+              </p>
+            )}
 
-            </div>
-
-            {/* Free User Message */}
             {!isPremium && (
               <div className="mt-2 p-3 rounded-lg bg-warning-50 border border-warning-200">
                 <p className="text-sm text-warning-700">
@@ -309,7 +416,6 @@ export default function AddLessonPage() {
               </div>
             )}
 
-            {/* Premium User Message */}
             {isPremium && (
               <p className="text-xs text-success-600 mt-2">
                 ✓ Premium account — you can create paid
@@ -317,13 +423,6 @@ export default function AddLessonPage() {
               </p>
             )}
           </div>
-
-          {/* Error */}
-          {error && (
-            <div className="p-3 rounded-lg bg-danger-50 text-danger-600">
-              {error}
-            </div>
-          )}
 
           {/* Success */}
           {success && (
@@ -347,7 +446,6 @@ export default function AddLessonPage() {
 
         </form>
       </Card>
-
     </div>
   );
 }

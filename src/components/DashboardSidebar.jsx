@@ -33,7 +33,7 @@ export function DashboardSidebar() {
     {
       icon: FolderPlus,
       label: "Update Lesson",
-      href: "/dashboard/update-lesson",
+      href: "/dashboard/update-lessons",
     },
     {
       icon: Bookmark,

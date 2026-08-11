@@ -1,4 +1,5 @@
 "use client";
+import {Description, Label, Radio, RadioGroup} from "@heroui/react";
 import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
 import Link from "next/link";
@@ -9,7 +10,7 @@ import { useRouter } from "next/navigation";
 const RegisterPage = () => {
   const router = useRouter();
   const [error, setError] = useState("");
-
+  const [role, setRole] = useState("user");
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
@@ -39,6 +40,7 @@ const RegisterPage = () => {
       email,
       photo,
       password,
+      role: role
     };
 
     console.log(user);
@@ -47,6 +49,7 @@ const RegisterPage = () => {
     email: user.email, // required
     password: user.password, // required
     image:user. photo,
+    role: user.role
     
 });
 
@@ -131,7 +134,32 @@ console.log({data, error});
               variant="bordered"
               required
             />
-
+ <div className="flex flex-col gap-4">
+      <Label className="text-white">Subscription plan</Label>
+      <RadioGroup defaultValue="user" name="plan-orientation"  onChange={(value) => setRole(value)}
+      orientation="horizontal">
+        <Radio  value="admin">
+          <Radio.Content className="text-white">
+            <Radio.Control>
+              <Radio.Indicator />
+            </Radio.Control>
+          Admin
+          </Radio.Content>
+         
+        </Radio>
+        <Radio selected  value="user">
+          <Radio.Content className="text-white">
+            <Radio.Control >
+              <Radio.Indicator />
+            </Radio.Control>
+          User
+          </Radio.Content>
+          
+        </Radio>
+       
+        
+      </RadioGroup>
+    </div>
             <div className="text-sm text-slate-400 space-y-1">
               <p>Password must:</p>
               <ul className="list-disc list-inside">
