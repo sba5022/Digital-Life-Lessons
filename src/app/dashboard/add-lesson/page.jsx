@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Card, Button } from "@heroui/react";
-
+import { useRouter } from "next/navigation";
 const categories = [
   "Personal Growth",
   "Career",
@@ -20,10 +20,11 @@ const emotionalTones = [
   "Gratitude",
 ];
 
-export default function AddLessonPage() {
+export default  function AddLessonPage () {
   const { data: session, isPending } = authClient.useSession();
 
   const user = session?.user;
+const router = useRouter();
 
   // Change this according to your database structure
   const isPremium = user?.plan === "Premium";
@@ -160,13 +161,18 @@ export default function AddLessonPage() {
     };
 
     console.log("Lesson:", lessonData);
-
-    // TODO:
-    // Send lessonData to your API / MongoDB here.
-
+    fetch('http://localhost:3001/lesson', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(lessonData),
+    });
+ const data = await res.json();
+ console.log('Response from server:', data);
     setSuccess("Lesson created successfully!");
 
-    // Reset form
+
     setFormData({
       title: "",
       description: "",
@@ -438,6 +444,7 @@ export default function AddLessonPage() {
               type="submit"
               color="primary"
               size="lg"
+              onPress={() => router.push("/dashboard/my-lessons")}
             >
               Create Lesson
             </Button>

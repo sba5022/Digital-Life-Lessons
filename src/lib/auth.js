@@ -25,5 +25,9 @@ export const auth = betterAuth({
           // type: String,
           default: "user",
         },
-    }}
+    },
+  plan: {
+    default: "Free",  
+  }
+  }
 });

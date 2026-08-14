@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
+
 import Link from "next/link";
 import {
   Button,
@@ -48,17 +50,36 @@ export default function MyLessonsPage() {
 
   const [editingLesson, setEditingLesson] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
-
+const [loading, setLoading] = useState(true);
   const [isPremium] = useState(true);
 
   const [editTitle, setEditTitle] = useState("");
   const [editVisibility, setEditVisibility] = useState("Public");
   const [editAccess, setEditAccess] = useState("Free");
 
-  // -----------------------------
-  // DELETE LESSON
-  // -----------------------------
+ useEffect(() => {
+    const getLessons = async () => {
+      try {
+        const res = await fetch("http://localhost:3001/lesson");
 
+        if (!res.ok) {
+          throw new Error("Failed to fetch lessons");
+        }
+
+        const data = await res.json();
+
+        console.log("Fetched lessons:", data);
+
+        setLessons(data);
+      } catch (error) {
+        console.error("Error fetching lessons:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getLessons();
+  }, []);
   const handleDelete = () => {
     setLessons((prev) =>
       prev.filter((lesson) => lesson.id !== deleteId)
@@ -67,9 +88,7 @@ export default function MyLessonsPage() {
     setDeleteId(null);
   };
 
-  // -----------------------------
-  // OPEN UPDATE MODAL
-  // -----------------------------
+
 
   const handleEdit = (lesson) => {
     setEditingLesson(lesson);
@@ -79,9 +98,7 @@ export default function MyLessonsPage() {
     setEditAccess(lesson.access);
   };
 
-  // -----------------------------
-  // UPDATE LESSON
-  // -----------------------------
+
 
   const handleUpdate = (close) => {
     setLessons((prev) =>
@@ -369,13 +386,7 @@ export default function MyLessonsPage() {
           </Table.ScrollContainer>
 
         </Table>
-
-      </div>
-
-      {/* =========================
-          UPDATE MODAL
-      ========================= */}
-
+ </div>
       {editingLesson && (
         <Modal>
 
@@ -399,8 +410,7 @@ export default function MyLessonsPage() {
                 {({ close }) => (
 
                   <>
-
-                    <Modal.CloseTrigger />
+<Modal.CloseTrigger />
 
                     <Modal.Header>
 
@@ -561,11 +571,6 @@ export default function MyLessonsPage() {
 
         </Modal>
       )}
-
-      {/* =========================
-          DELETE CONFIRMATION MODAL
-      ========================= */}
-
       {deleteId && (
         <Modal>
 
