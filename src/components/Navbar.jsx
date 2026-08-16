@@ -45,6 +45,11 @@ const Navbar = () => {
                     Public Lessons
                 </Link>
             </li>
+            <li>
+                <Link href="/upgrade">
+                    Pricing
+                </Link>
+            </li>
 
             {user?.plan === "Free" && (
                 <li>

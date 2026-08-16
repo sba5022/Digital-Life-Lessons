@@ -1,29 +1,4 @@
-// 'use client';
-// import { DashboardSidebar } from '@/components/DashboardSidebar';
-// import React from 'react';
-// import { authClient } from "@/lib/auth-client";
 
-// const Dashboardlayout = ({children}) => {
-//     const { data: session , isLoading } = authClient.useSession();
-//     if (isLoading) {
-//         return <div>Loading...</div>;
-//     }
-
-//     if (!session) {
-//         return <div>You must be logged in to access the dashboard.</div>;
-//     }
-//     const user = session?.user;
-//     console.log(user,session);
-//     return (
-//         <div className='flex gap-3 min-h-screen'> 
-//             <DashboardSidebar/>
-//             <div>{children}</div>
-//            <div className='font-bold text-4xl'>Welcome, {user?.name}!</div>
-//         </div>
-//     );
-// };
-
-// export default Dashboardlayout;
 "use client";
 
 import { Card, Button } from "@heroui/react";
