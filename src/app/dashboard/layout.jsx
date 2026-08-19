@@ -40,7 +40,7 @@
 
 "use client";
 
-import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { authClient } from "@/lib/auth-client";
 
 const DashboardLayout = ({ children }) => {
