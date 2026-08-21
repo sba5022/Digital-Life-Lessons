@@ -21,11 +21,11 @@ const emotionalTones = [
   "Gratitude",
 ];
 
-export default  function AddLessonPage () {
+export default function AddLessonPage() {
   const { data: session, isPending } = authClient.useSession();
 
   const user = session?.user;
-const router = useRouter();
+  const router = useRouter();
 
   // Change this according to your database structure
   const isPremium = user?.plan === "Premium";
@@ -37,12 +37,15 @@ const router = useRouter();
     emotionalTone: "",
     // image: "",
     accessLevel: "Free",
+    visibility: "",
+    accessLevel: "",
+    createdAt: new Date(),
   });
 
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState("");
 
- 
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,7 +64,7 @@ const router = useRouter();
     setSuccess("");
   };
 
- 
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -151,29 +154,44 @@ const router = useRouter();
     }
 
     const lessonData = {
-      title: formData.title.trim(),
-      description: formData.description.trim(),
-      category: formData.category,
-      emotionalTone: formData.emotionalTone,
-      // image: formData.image.trim(),
-      accessLevel: isPremium
-        ? formData.accessLevel
-        : "Free",
-    };
-// const res = await createLesson(lessonData);
-// if (res.insertedId){
-//   e.target.reset();
-//   setIsRemote(false)
-// }
-    fetch('http://localhost:3001/lesson', {
+  title: formData.title.trim(),
+  description: formData.description.trim(),
+  category: formData.category,
+  emotionalTone: formData.emotionalTone,
+
+  accessLevel: isPremium
+    ? formData.accessLevel
+    : "Free",
+
+  visibility: "Public",
+  isPublic: true,
+
+  createdAt: new Date().toISOString(),
+
+  creatorName: user?.name || "Unknown User",
+  creatorPhoto: user?.image || "",
+
+  isFeatured: false,
+  isReviewed: false,
+  isFlagged: false,
+
+  reactions: 0,
+  saves: 0,
+};
+    // const res = await createLesson(lessonData);
+    // if (res.insertedId){
+    //   e.target.reset();
+    //   setIsRemote(false)
+    // }
+   const res = await fetch('http://localhost:3001/lesson', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(lessonData),
     });
- const data = await res.json();
- console.log('Response from server:', data);
+    const data = await res.json();
+    console.log('Response from server:', data);
     setSuccess("Lesson created successfully!");
 
 
@@ -232,7 +250,7 @@ const router = useRouter();
       <Card className="border border-default-200">
 
         <form
-        // validationBehavior="aria"
+          // validationBehavior="aria"
           onSubmit={handleSubmit}
           className="p-6 md:p-8 space-y-6"
         >
@@ -249,11 +267,10 @@ const router = useRouter();
               value={formData.title}
               onChange={handleChange}
               placeholder="What did you learn?"
-              className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none ${
-                errors.title
+              className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none ${errors.title
                   ? "border-danger"
                   : "border-default-300 focus:border-primary"
-              }`}
+                }`}
             />
 
             {errors.title && (
@@ -275,11 +292,10 @@ const router = useRouter();
               onChange={handleChange}
               placeholder="Share your story or explain the lesson..."
               rows={7}
-              className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none resize-none ${
-                errors.description
+              className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none resize-none ${errors.description
                   ? "border-danger"
                   : "border-default-300 focus:border-primary"
-              }`}
+                }`}
             />
 
             <div className="flex justify-between mt-2">
@@ -312,11 +328,10 @@ const router = useRouter();
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none ${
-                  errors.category
+                className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none ${errors.category
                     ? "border-danger"
                     : "border-default-300 focus:border-primary"
-                }`}
+                  }`}
               >
                 <option value="">
                   Select category
@@ -349,11 +364,10 @@ const router = useRouter();
                 name="emotionalTone"
                 value={formData.emotionalTone}
                 onChange={handleChange}
-                className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none ${
-                  errors.emotionalTone
+                className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none ${errors.emotionalTone
                     ? "border-danger"
                     : "border-default-300 focus:border-primary"
-                }`}
+                  }`}
               >
                 <option value="">
                   Select emotional tone
@@ -377,8 +391,8 @@ const router = useRouter();
             </div>
           </div>
 
-       
-    
+
+
           <div>
             <label className="block text-sm font-semibold mb-2">
               Access Level
@@ -393,11 +407,10 @@ const router = useRouter();
               }
               onChange={handleAccessChange}
               disabled={!isPremium}
-              className={`w-full rounded-xl border px-4 py-3 outline-none ${
-                isPremium
+              className={`w-full rounded-xl border px-4 py-3 outline-none ${isPremium
                   ? "border-default-300 bg-transparent focus:border-primary"
                   : "border-default-200 bg-default-100 text-default-500 cursor-not-allowed"
-              }`}
+                }`}
             >
               <option value="Free">
                 Free

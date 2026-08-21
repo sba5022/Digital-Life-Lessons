@@ -50,19 +50,19 @@ export default function MyLessonsPage() {
 
   const [editingLesson, setEditingLesson] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
-const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [isPremium] = useState(true);
 
   const [editTitle, setEditTitle] = useState("");
   const [editVisibility, setEditVisibility] = useState("Public");
   const [editAccess, setEditAccess] = useState("Free");
 
- useEffect(() => {
+  useEffect(() => {
     const getLessons = async () => {
       try {
-      const res = await fetch("http://localhost:3001/lesson", {
-  cache: "no-store",
-});
+        const res = await fetch("http://localhost:3001/lesson", {
+          cache: "no-store",
+        });
 
         if (!res.ok) {
           throw new Error("Failed to fetch lessons");
@@ -82,12 +82,41 @@ const [loading, setLoading] = useState(true);
 
     getLessons();
   }, []);
-  const handleDelete = () => {
-    setLessons((prev) =>
-      prev.filter((lesson) => lesson.id !== deleteId)
+   const handleDelete = async (id) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this lesson?"
     );
 
-    setDeleteId(null);
+    if (!confirmed) return;
+
+    try {
+      setActionLoading(id);
+
+      const res = await fetch(`${API_URL}/lesson/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+  const errorData = await res.json().catch(() => null);
+
+  console.log("DELETE STATUS:", res.status);
+  console.log("DELETE RESPONSE:", errorData);
+
+  throw new Error(
+    errorData?.message || "Failed to delete lesson"
+  );
+}
+
+      setLessons((prevLessons) =>
+        prevLessons.filter((lesson) => lesson._id !== id)
+      );
+    } catch (error) {
+      console.error("DELETE ERROR:", error);
+
+      alert("Failed to delete lesson.");
+    } finally {
+      setActionLoading(null);
+    }
   };
 
 
@@ -107,13 +136,14 @@ const [loading, setLoading] = useState(true);
       prev.map((lesson) =>
         lesson.id === editingLesson.id
           ? {
-              ...lesson,
-              title: editTitle,
-              visibility: editVisibility,
-              access: isPremium
-                ? editAccess
-                : "Free",
-            }
+            ...lesson,
+            title: editTitle,
+            visibility: editVisibility,
+            access: isPremium
+              ? editAccess
+              : "Free",
+              
+          }
           : lesson
       )
     );
@@ -218,40 +248,40 @@ const [loading, setLoading] = useState(true);
           <Table.ScrollContainer>
 
             <Table.Content aria-label="My lessons">
-<Table.Header>
-  <Table.Column id="title" isRowHeader>
-    Lesson
-  </Table.Column>
+              <Table.Header>
+                <Table.Column id="title" isRowHeader>
+                  Lesson
+                </Table.Column>
 
-  <Table.Column id="category">
-    Category
-  </Table.Column>
+                <Table.Column id="category">
+                  Category
+                </Table.Column>
 
-  <Table.Column id="visibility">
-    Visibility
-  </Table.Column>
+                <Table.Column id="visibility">
+                  Visibility
+                </Table.Column>
 
-  <Table.Column id="access">
-    Access
-  </Table.Column>
+                <Table.Column id="access">
+                  Access
+                </Table.Column>
 
-  <Table.Column id="created">
-    Created
-  </Table.Column>
+                <Table.Column id="created">
+                  Created
+                </Table.Column>
 
-  <Table.Column id="stats">
-    Stats
-  </Table.Column>
+                <Table.Column id="stats">
+                  Stats
+                </Table.Column>
 
-  <Table.Column id="actions">
-    Actions
-  </Table.Column>
-</Table.Header>
+                <Table.Column id="actions">
+                  Actions
+                </Table.Column>
+              </Table.Header>
               <Table.Body>
 
                 {lessons.map((lesson) => (
 
-                  <Table.Row key={lesson.id} id={lesson.id}>
+                  <Table.Row key={lesson._id} id={lesson._id}>
 
                     {/* Lesson */}
                     <Table.Cell>
@@ -262,7 +292,7 @@ const [loading, setLoading] = useState(true);
                         </p>
 
                         <p className="text-xs text-default-500">
-                          #{lesson.id}
+                          #{lesson._id}
                         </p>
                       </div>
 
@@ -279,14 +309,14 @@ const [loading, setLoading] = useState(true);
                     <Table.Cell>
 
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          lesson.visibility ===
-                          "Public"
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${lesson.visibility ===
+                            "Public"
                             ? "bg-success-100 text-success-700"
                             : "bg-warning-100 text-warning-700"
-                        }`}
+                          }`}
                       >
-                        {lesson.visibility}
+                         {lesson.visibility || "Private"}
+                        
                       </span>
 
                     </Table.Cell>
@@ -295,22 +325,30 @@ const [loading, setLoading] = useState(true);
                     <Table.Cell>
 
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          lesson.access ===
-                          "Premium"
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${lesson.accessLevel ===
+                            "Premium"
                             ? "bg-secondary-100 text-secondary-700"
                             : "bg-default-100 text-default-700"
-                        }`}
+                          }`}
                       >
-                        {lesson.access}
+                        {lesson.accessLevel}
                       </span>
 
                     </Table.Cell>
 
                     {/* Created */}
-                    <Table.Cell>
-                      {lesson.createdAt}
-                    </Table.Cell>
+                   <Table.Cell>
+  {lesson.createdAt
+    ? new Date(lesson.createdAt).toLocaleDateString(
+        "en-US",
+        {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        }
+      )
+    : "N/A"}
+</Table.Cell>
 
                     {/* Stats */}
                     <Table.Cell>
@@ -361,9 +399,9 @@ const [loading, setLoading] = useState(true);
                           color="danger"
                           variant="secondary"
                           onPress={() =>
-                            setDeleteId(
-                              lesson.id
-                            )
+                              handleDelete(
+                                  lesson._id
+                                )
                           }
                         >
                           Delete
@@ -384,7 +422,7 @@ const [loading, setLoading] = useState(true);
           </Table.ScrollContainer>
 
         </Table>
- </div>
+      </div>
       {editingLesson && (
         <Modal>
 
@@ -408,7 +446,7 @@ const [loading, setLoading] = useState(true);
                 {({ close }) => (
 
                   <>
-<Modal.CloseTrigger />
+                    <Modal.CloseTrigger />
 
                     <Modal.Header>
 

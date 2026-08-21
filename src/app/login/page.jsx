@@ -357,7 +357,7 @@ export default function LoginPage() {
                 placeholder="example@email.com"
                 variant="bordered"
                 isRequired
-                classNames={{
+                classnames={{
                   input: "text-white",
                   label: "text-white/60",
                   inputWrapper:
@@ -373,7 +373,7 @@ export default function LoginPage() {
                 placeholder="Enter your password"
                 variant="bordered"
                 isRequired
-                classNames={{
+                classnames={{
                   input: "text-white",
                   label: "text-white/60",
                   inputWrapper:

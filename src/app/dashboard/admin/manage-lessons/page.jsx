@@ -77,8 +77,15 @@ const ManageLessons = () => {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to delete lesson");
-      }
+  const errorData = await res.json().catch(() => null);
+
+  console.log("DELETE STATUS:", res.status);
+  console.log("DELETE RESPONSE:", errorData);
+
+  throw new Error(
+    errorData?.message || "Failed to delete lesson"
+  );
+}
 
       setLessons((prevLessons) =>
         prevLessons.filter((lesson) => lesson._id !== id)
