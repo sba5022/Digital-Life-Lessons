@@ -5,6 +5,7 @@ import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Card, Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
+import { createLesson } from "@/lib/actions/lesson";
 const categories = [
   "Personal Growth",
   "Career",
@@ -159,8 +160,11 @@ const router = useRouter();
         ? formData.accessLevel
         : "Free",
     };
-
-    console.log("Lesson:", lessonData);
+// const res = await createLesson(lessonData);
+// if (res.insertedId){
+//   e.target.reset();
+//   setIsRemote(false)
+// }
     fetch('http://localhost:3001/lesson', {
       method: 'POST',
       headers: {

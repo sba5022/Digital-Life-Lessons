@@ -60,7 +60,9 @@ const [loading, setLoading] = useState(true);
  useEffect(() => {
     const getLessons = async () => {
       try {
-        const res = await fetch("http://localhost:3001/lesson");
+      const res = await fetch("http://localhost:3001/lesson", {
+  cache: "no-store",
+});
 
         if (!res.ok) {
           throw new Error("Failed to fetch lessons");
@@ -171,7 +173,7 @@ const [loading, setLoading] = useState(true);
           <h2 className="text-3xl font-bold mt-2">
             {lessons.reduce(
               (total, lesson) =>
-                total + lesson.reactions,
+                total + (lesson.reactions || 0),
               0
             )}
           </h2>
@@ -185,7 +187,7 @@ const [loading, setLoading] = useState(true);
           <h2 className="text-3xl font-bold mt-2">
             {lessons.reduce(
               (total, lesson) =>
-                total + lesson.saves,
+                total + (lesson.saves || 0),
               0
             )}
           </h2>
@@ -216,39 +218,35 @@ const [loading, setLoading] = useState(true);
           <Table.ScrollContainer>
 
             <Table.Content aria-label="My lessons">
+<Table.Header>
+  <Table.Column id="title" isRowHeader>
+    Lesson
+  </Table.Column>
 
-              <Table.Header>
+  <Table.Column id="category">
+    Category
+  </Table.Column>
 
-                <Table.Column id="title">
-                  Lesson
-                </Table.Column>
+  <Table.Column id="visibility">
+    Visibility
+  </Table.Column>
 
-                <Table.Column id="category">
-                  Category
-                </Table.Column>
+  <Table.Column id="access">
+    Access
+  </Table.Column>
 
-                <Table.Column id="visibility">
-                  Visibility
-                </Table.Column>
+  <Table.Column id="created">
+    Created
+  </Table.Column>
 
-                <Table.Column id="access">
-                  Access
-                </Table.Column>
+  <Table.Column id="stats">
+    Stats
+  </Table.Column>
 
-                <Table.Column id="created">
-                  Created
-                </Table.Column>
-
-                <Table.Column id="stats">
-                  Stats
-                </Table.Column>
-
-                <Table.Column id="actions">
-                  Actions
-                </Table.Column>
-
-              </Table.Header>
-
+  <Table.Column id="actions">
+    Actions
+  </Table.Column>
+</Table.Header>
               <Table.Body>
 
                 {lessons.map((lesson) => (
