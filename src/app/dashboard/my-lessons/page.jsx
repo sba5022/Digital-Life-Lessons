@@ -52,7 +52,7 @@ export default function MyLessonsPage() {
   const [deleteId, setDeleteId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isPremium] = useState(true);
-
+const [actionLoading, setActionLoading] = useState(null);
   const [editTitle, setEditTitle] = useState("");
   const [editVisibility, setEditVisibility] = useState("Public");
   const [editAccess, setEditAccess] = useState("Free");
@@ -92,9 +92,9 @@ export default function MyLessonsPage() {
     try {
       setActionLoading(id);
 
-      const res = await fetch(`${API_URL}/lesson/${id}`, {
-        method: "DELETE",
-      });
+     const res = await fetch(`http://localhost:3001/lesson/${id}`, {
+  method: "DELETE",
+});
 
       if (!res.ok) {
   const errorData = await res.json().catch(() => null);
@@ -277,145 +277,124 @@ export default function MyLessonsPage() {
                   Actions
                 </Table.Column>
               </Table.Header>
-              <Table.Body>
+        <Table.Body>
+  {lessons.map((lesson) => (
+    <Table.Row
+      key={lesson._id?.toString()}
+      id={lesson._id?.toString()}
+    >
+      {/* Lesson */}
+      <Table.Cell>
+        <div>
+          <p className="font-semibold">
+            {lesson.title}
+          </p>
 
-                {lessons.map((lesson) => (
+          <p className="text-xs text-default-500">
+            #{lesson._id?.toString()}
+          </p>
+        </div>
+      </Table.Cell>
 
-                  <Table.Row key={lesson._id} id={lesson._id}>
+      {/* Category */}
+      <Table.Cell>
+        <span className="text-sm">
+          {lesson.category}
+        </span>
+      </Table.Cell>
 
-                    {/* Lesson */}
-                    <Table.Cell>
+      {/* Visibility */}
+      <Table.Cell>
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-medium ${
+            lesson.visibility === "Public"
+              ? "bg-success-100 text-success-700"
+              : "bg-warning-100 text-warning-700"
+          }`}
+        >
+          {lesson.visibility || "Private"}
+        </span>
+      </Table.Cell>
 
-                      <div>
-                        <p className="font-semibold">
-                          {lesson.title}
-                        </p>
+      {/* Access */}
+      <Table.Cell>
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-medium ${
+            lesson.accessLevel === "Premium"
+              ? "bg-secondary-100 text-secondary-700"
+              : "bg-default-100 text-default-700"
+          }`}
+        >
+          {lesson.accessLevel || "Free"}
+        </span>
+      </Table.Cell>
 
-                        <p className="text-xs text-default-500">
-                          #{lesson._id}
-                        </p>
-                      </div>
+      {/* Created */}
+      <Table.Cell>
+        {lesson.createdAt
+          ? new Date(lesson.createdAt).toLocaleDateString(
+              "en-US",
+              {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              }
+            )
+          : "N/A"}
+      </Table.Cell>
 
-                    </Table.Cell>
+      {/* Stats */}
+      <Table.Cell>
+        <div className="text-xs space-y-1">
+          <p>
+            ❤️ {lesson.reactions || 0} reactions
+          </p>
 
-                    {/* Category */}
-                    <Table.Cell>
-                      <span className="text-sm">
-                        {lesson.category}
-                      </span>
-                    </Table.Cell>
+          <p>
+            ⭐ {lesson.saves || 0} saves
+          </p>
+        </div>
+      </Table.Cell>
 
-                    {/* Visibility */}
-                    <Table.Cell>
+      {/* Actions */}
+      <Table.Cell>
+        <div className="flex items-center gap-2">
 
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${lesson.visibility ===
-                            "Public"
-                            ? "bg-success-100 text-success-700"
-                            : "bg-warning-100 text-warning-700"
-                          }`}
-                      >
-                         {lesson.visibility || "Private"}
-                        
-                      </span>
+          {/* Details */}
+          <Button
+            as={Link}
+            href={`/dashboard/my-lessons/${lesson._id}`}
+            size="sm"
+            variant="secondary"
+          >
+            Details
+          </Button>
 
-                    </Table.Cell>
+          {/* Update */}
+          <Button
+            size="sm"
+            color="primary"
+            onPress={() => handleEdit(lesson)}
+          >
+            Update
+          </Button>
 
-                    {/* Access */}
-                    <Table.Cell>
+          {/* Delete */}
+          <Button
+            size="sm"
+            color="danger"
+            variant="secondary"
+            isLoading={actionLoading === lesson._id}
+            onPress={() => handleDelete(lesson._id)}
+          >
+            Delete
+          </Button>
 
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${lesson.accessLevel ===
-                            "Premium"
-                            ? "bg-secondary-100 text-secondary-700"
-                            : "bg-default-100 text-default-700"
-                          }`}
-                      >
-                        {lesson.accessLevel}
-                      </span>
-
-                    </Table.Cell>
-
-                    {/* Created */}
-                   <Table.Cell>
-  {lesson.createdAt
-    ? new Date(lesson.createdAt).toLocaleDateString(
-        "en-US",
-        {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        }
-      )
-    : "N/A"}
-</Table.Cell>
-
-                    {/* Stats */}
-                    <Table.Cell>
-
-                      <div className="text-xs space-y-1">
-                        <p>
-                          ❤️ {lesson.reactions}
-                          {" "} reactions
-                        </p>
-
-                        <p>
-                          ⭐ {lesson.saves}
-                          {" "} saves
-                        </p>
-                      </div>
-
-                    </Table.Cell>
-
-                    {/* Actions */}
-                    <Table.Cell>
-
-                      <div className="flex items-center gap-2">
-
-                        {/* Details */}
-                        <Button
-                          as={Link}
-                          href={`/dashboard/my-lessons/${lesson.id}`}
-                          size="sm"
-                          variant="secondary"
-                        >
-                          Details
-                        </Button>
-
-                        {/* Update */}
-                        <Button
-                          size="sm"
-                          color="primary"
-                          onPress={() =>
-                            handleEdit(lesson)
-                          }
-                        >
-                          Update
-                        </Button>
-
-                        {/* Delete */}
-                        <Button
-                          size="sm"
-                          color="danger"
-                          variant="secondary"
-                          onPress={() =>
-                              handleDelete(
-                                  lesson._id
-                                )
-                          }
-                        >
-                          Delete
-                        </Button>
-
-                      </div>
-
-                    </Table.Cell>
-
-                  </Table.Row>
-
-                ))}
-
-              </Table.Body>
+        </div>
+      </Table.Cell>
+    </Table.Row>
+  ))}
+</Table.Body>
 
             </Table.Content>
 

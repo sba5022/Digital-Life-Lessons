@@ -37,7 +37,7 @@ export default function AddLessonPage() {
     emotionalTone: "",
     // image: "",
     accessLevel: "Free",
-    visibility: "",
+    visibility: "Public",
     accessLevel: "",
     createdAt: new Date(),
   });
@@ -102,7 +102,10 @@ export default function AddLessonPage() {
       newErrors.emotionalTone =
         "Please select an emotional tone.";
     }
-
+// Visibility
+if (!formData.visibility) {
+  newErrors.visibility = "Please select visibility.";
+}
     // Image
     // if (formData.image.trim()) {
     //   try {
@@ -154,6 +157,8 @@ export default function AddLessonPage() {
     }
 
     const lessonData = {
+      creatorId: user?.id || "unknown",
+      creatorEmail: user?.email || "unknown",
   title: formData.title.trim(),
   description: formData.description.trim(),
   category: formData.category,
@@ -163,8 +168,8 @@ export default function AddLessonPage() {
     ? formData.accessLevel
     : "Free",
 
-  visibility: "Public",
-  isPublic: true,
+ visibility: formData.visibility,
+isPublic: formData.visibility === "Public",
 
   createdAt: new Date().toISOString(),
 
@@ -178,6 +183,8 @@ export default function AddLessonPage() {
   reactions: 0,
   saves: 0,
 };
+console.log("LESSON:", lessonData);
+console.log("CREATOR EMAIL:", lessonData.creatorEmail);
     // const res = await createLesson(lessonData);
     // if (res.insertedId){
     //   e.target.reset();
@@ -391,7 +398,42 @@ export default function AddLessonPage() {
             </div>
           </div>
 
+{/* Visibility */}
+<div>
+  <label className="block text-sm font-semibold mb-2">
+    Visibility
+  </label>
 
+  <select
+    name="visibility"
+    value={formData.visibility}
+    onChange={handleChange}
+    className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none ${
+      errors.visibility
+        ? "border-danger"
+        : "border-default-300 focus:border-primary"
+    }`}
+  >
+    <option value="Public">
+      Public
+    </option>
+
+    <option value="Private">
+      Private
+    </option>
+  </select>
+
+  {errors.visibility && (
+    <p className="text-danger text-sm mt-2">
+      {errors.visibility}
+    </p>
+  )}
+
+  <p className="text-xs text-default-400 mt-2">
+    Public lessons can be viewed by everyone. Private
+    lessons are only visible to you.
+  </p>
+</div>
 
           <div>
             <label className="block text-sm font-semibold mb-2">

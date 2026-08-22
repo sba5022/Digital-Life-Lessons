@@ -119,15 +119,22 @@ const LessonsCard = ({ lesson }) => {
         {/* Details Button */}
         <div className="mt-6 border-t border-white/10 pt-5">
 
-          <Button
-            as={Link}
-            href={`/lessons/${_id}`}
-            radius="none"
-            className="w-full bg-white text-black font-semibold transition group-hover:bg-white/90"
-            endContent={<ArrowUpRight size={17} />}
-          >
-            See Details
-          </Button>
+          <Link
+  href={`/lessons/${_id}`}
+  className="group flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.06] px-5 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:bg-white hover:text-black"
+>
+  <span className="tracking-wide">
+    See Details
+  </span>
+
+  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-all duration-300 group-hover:bg-black/10 group-hover:translate-x-1">
+    <ArrowUpRight
+      size={17}
+      strokeWidth={2}
+      className="transition-transform duration-300 group-hover:rotate-12"
+    />
+  </span>
+</Link>
 
         </div>
 

@@ -32,11 +32,11 @@ export const auth = betterAuth({
   }
   }
 });
-console.log("MONGODB:", !!process.env.MONGODB_URI);
-console.log("GOOGLE CLIENT ID:", !!process.env.GOOGLE_CLIENT_ID);
-console.log("GOOGLE CLIENT SECRET:", !!process.env.GOOGLE_CLIENT_SECRET);
-console.log("BETTER AUTH URL:", process.env.BETTER_AUTH_URL);
-console.log(
-  "BETTER AUTH SECRET:",
-  !!process.env.BETTER_AUTH_SECRET
-);
+// console.log("MONGODB:", !!process.env.MONGODB_URI);
+// console.log("GOOGLE CLIENT ID:", !!process.env.GOOGLE_CLIENT_ID);
+// console.log("GOOGLE CLIENT SECRET:", !!process.env.GOOGLE_CLIENT_SECRET);
+// console.log("BETTER AUTH URL:", process.env.BETTER_AUTH_URL);
+// console.log(
+//   "BETTER AUTH SECRET:",
+//   !!process.env.BETTER_AUTH_SECRET
+// );
