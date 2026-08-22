@@ -30,7 +30,6 @@ const API_URL = "http://localhost:3001";
 const PublicLessonDetailsPage = () => {
   const params = useParams();
   const router = useRouter();
-
   const id = params?.id;
 const { data: session, isPending } =
   authClient.useSession();

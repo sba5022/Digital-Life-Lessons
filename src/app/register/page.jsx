@@ -119,6 +119,7 @@ const RegisterPage = () => {
     email,
     password,
     image: photo,
+    
   });
 
   if (error) {

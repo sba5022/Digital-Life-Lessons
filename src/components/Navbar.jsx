@@ -44,9 +44,14 @@ const Navbar = () => {
                 <Link href="/public-lessons">
                     Public Lessons
                 </Link>
+                {/* {session?.user?.role === "user" && (
+  <Link href="/add-lesson">
+    Add Lesson
+  </Link>
+)} */}
             </li>
             <li>
-                <Link href="/upgrade">
+                <Link href="/pricing">
                     Pricing
                 </Link>
             </li>

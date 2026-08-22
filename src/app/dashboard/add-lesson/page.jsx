@@ -37,8 +37,8 @@ export default function AddLessonPage() {
     emotionalTone: "",
     // image: "",
     accessLevel: "Free",
-    visibility: "Public",
-    accessLevel: "",
+    visibility: "public",
+   
     createdAt: new Date(),
   });
 
@@ -102,10 +102,10 @@ export default function AddLessonPage() {
       newErrors.emotionalTone =
         "Please select an emotional tone.";
     }
-// Visibility
-if (!formData.visibility) {
-  newErrors.visibility = "Please select visibility.";
-}
+    // Visibility
+    if (!formData.visibility) {
+      newErrors.visibility = "Please select visibility.";
+    }
     // Image
     // if (formData.image.trim()) {
     //   try {
@@ -146,73 +146,93 @@ if (!formData.visibility) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    setSuccess("");
+  setSuccess("");
 
-    const isValid = validateForm();
+  const isValid = validateForm();
 
-    if (!isValid) {
-      return;
+  if (!isValid) {
+    return;
+  }
+
+  const lessonData = {
+    creatorId: user?.id || "unknown",
+    creatorEmail: user?.email || "unknown",
+    title: formData.title.trim(),
+    description: formData.description.trim(),
+    category: formData.category,
+    emotionalTone: formData.emotionalTone,
+
+    accessLevel: isPremium
+      ? formData.accessLevel
+      : "Free",
+
+    visibility: formData.visibility,
+    isPublic: formData.visibility === "Public",
+
+    createdAt: new Date().toISOString(),
+
+    creatorName: user?.name || "Unknown User",
+    creatorPhoto: user?.image || "",
+
+    isFeatured: false,
+    isReviewed: false,
+    isFlagged: false,
+
+    reactions: 0,
+    saves: 0,
+  };
+
+  console.log("LESSON:", lessonData);
+
+  try {
+   console.log("🔥 ABOUT TO SEND REQUEST");
+
+const res = await fetch("http://localhost:3001/lesson", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(lessonData),
+});
+
+console.log("🔥 REQUEST FINISHED");
+console.log("🔥 STATUS:", res.status);
+    const data = await res.json();
+
+    console.log("STATUS:", res.status);
+    console.log("SERVER RESPONSE:", data);
+
+    if (!res.ok) {
+      throw new Error(data.message || "Failed to create lesson");
     }
 
-    const lessonData = {
-      creatorId: user?.id || "unknown",
-      creatorEmail: user?.email || "unknown",
-  title: formData.title.trim(),
-  description: formData.description.trim(),
-  category: formData.category,
-  emotionalTone: formData.emotionalTone,
-
-  accessLevel: isPremium
-    ? formData.accessLevel
-    : "Free",
-
- visibility: formData.visibility,
-isPublic: formData.visibility === "Public",
-
-  createdAt: new Date().toISOString(),
-
-  creatorName: user?.name || "Unknown User",
-  creatorPhoto: user?.image || "",
-
-  isFeatured: false,
-  isReviewed: false,
-  isFlagged: false,
-
-  reactions: 0,
-  saves: 0,
-};
-console.log("LESSON:", lessonData);
-console.log("CREATOR EMAIL:", lessonData.creatorEmail);
-    // const res = await createLesson(lessonData);
-    // if (res.insertedId){
-    //   e.target.reset();
-    //   setIsRemote(false)
-    // }
-   const res = await fetch('http://localhost:3001/lesson', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(lessonData),
-    });
-    const data = await res.json();
-    console.log('Response from server:', data);
     setSuccess("Lesson created successfully!");
-
 
     setFormData({
       title: "",
       description: "",
       category: "",
       emotionalTone: "",
-      image: "",
       accessLevel: "Free",
+      visibility: "Public",
     });
 
     setErrors({});
-  };
+
+    // Navigate ONLY after successful insertion
+    setTimeout(() => {
+      router.push("/dashboard/my-lessons");
+    }, 1000);
+
+  } catch (error) {
+    console.error("CREATE LESSON ERROR:", error);
+
+    setSuccess("");
+    alert("Failed to create lesson. Please try again.");
+  }
+};
 
 
 
@@ -275,8 +295,8 @@ console.log("CREATOR EMAIL:", lessonData.creatorEmail);
               onChange={handleChange}
               placeholder="What did you learn?"
               className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none ${errors.title
-                  ? "border-danger"
-                  : "border-default-300 focus:border-primary"
+                ? "border-danger"
+                : "border-default-300 focus:border-primary"
                 }`}
             />
 
@@ -300,8 +320,8 @@ console.log("CREATOR EMAIL:", lessonData.creatorEmail);
               placeholder="Share your story or explain the lesson..."
               rows={7}
               className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none resize-none ${errors.description
-                  ? "border-danger"
-                  : "border-default-300 focus:border-primary"
+                ? "border-danger"
+                : "border-default-300 focus:border-primary"
                 }`}
             />
 
@@ -336,8 +356,8 @@ console.log("CREATOR EMAIL:", lessonData.creatorEmail);
                 value={formData.category}
                 onChange={handleChange}
                 className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none ${errors.category
-                    ? "border-danger"
-                    : "border-default-300 focus:border-primary"
+                  ? "border-danger"
+                  : "border-default-300 focus:border-primary"
                   }`}
               >
                 <option value="">
@@ -372,8 +392,8 @@ console.log("CREATOR EMAIL:", lessonData.creatorEmail);
                 value={formData.emotionalTone}
                 onChange={handleChange}
                 className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none ${errors.emotionalTone
-                    ? "border-danger"
-                    : "border-default-300 focus:border-primary"
+                  ? "border-danger"
+                  : "border-default-300 focus:border-primary"
                   }`}
               >
                 <option value="">
@@ -398,42 +418,41 @@ console.log("CREATOR EMAIL:", lessonData.creatorEmail);
             </div>
           </div>
 
-{/* Visibility */}
-<div>
-  <label className="block text-sm font-semibold mb-2">
-    Visibility
-  </label>
+          {/* Visibility */}
+          <div>
+            <label className="block text-sm font-semibold mb-2">
+              Visibility
+            </label>
 
-  <select
-    name="visibility"
-    value={formData.visibility}
-    onChange={handleChange}
-    className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none ${
-      errors.visibility
-        ? "border-danger"
-        : "border-default-300 focus:border-primary"
-    }`}
-  >
-    <option value="Public">
-      Public
-    </option>
+            <select
+              name="visibility"
+              value={formData.visibility}
+              onChange={handleChange}
+              className={`w-full rounded-xl border px-4 py-3 bg-transparent outline-none ${errors.visibility
+                  ? "border-danger"
+                  : "border-default-300 focus:border-primary"
+                }`}
+            >
+              <option value="Public">
+                Public
+              </option>
 
-    <option value="Private">
-      Private
-    </option>
-  </select>
+              <option value="Private">
+                Private
+              </option>
+            </select>
 
-  {errors.visibility && (
-    <p className="text-danger text-sm mt-2">
-      {errors.visibility}
-    </p>
-  )}
+            {errors.visibility && (
+              <p className="text-danger text-sm mt-2">
+                {errors.visibility}
+              </p>
+            )}
 
-  <p className="text-xs text-default-400 mt-2">
-    Public lessons can be viewed by everyone. Private
-    lessons are only visible to you.
-  </p>
-</div>
+            <p className="text-xs text-default-400 mt-2">
+              Public lessons can be viewed by everyone. Private
+              lessons are only visible to you.
+            </p>
+          </div>
 
           <div>
             <label className="block text-sm font-semibold mb-2">
@@ -450,8 +469,8 @@ console.log("CREATOR EMAIL:", lessonData.creatorEmail);
               onChange={handleAccessChange}
               disabled={!isPremium}
               className={`w-full rounded-xl border px-4 py-3 outline-none ${isPremium
-                  ? "border-default-300 bg-transparent focus:border-primary"
-                  : "border-default-200 bg-default-100 text-default-500 cursor-not-allowed"
+                ? "border-default-300 bg-transparent focus:border-primary"
+                : "border-default-200 bg-default-100 text-default-500 cursor-not-allowed"
                 }`}
             >
               <option value="Free">
@@ -503,7 +522,7 @@ console.log("CREATOR EMAIL:", lessonData.creatorEmail);
               type="submit"
               color="primary"
               size="lg"
-              onPress={() => router.push("/dashboard/my-lessons")}
+              // onPress={() => router.push("/dashboard/my-lessons")}
             >
               Create Lesson
             </Button>
